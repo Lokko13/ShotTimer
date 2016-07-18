@@ -14,12 +14,16 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
     private TextView timer;
     private Button startStopButton;
+    private Button resetButton;
 
     private long startTime = 0L;
-    
+    private boolean started = false;
+
     long timeInMilliseconds = 0L;
     long timeSwapBuff = 0L;
     long updatedTime = 0L;
@@ -29,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private Runnable updateTimerThread = new Runnable() {
         @Override
         public void run() {
+            if(started == false){
+                startTime = SystemClock.uptimeMillis();
+                started = true;
+            }
             timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
             updatedTime = timeSwapBuff + timeInMilliseconds;
 
@@ -36,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
             int mins = secs / 60;
             secs = secs % 60;
             int milliseconds = (int) (updatedTime % 1000);
-            timer.setText("" + mins + ":"
-                            + String.format("%02d", secs) + ":"
-                            + String.format("%03d", milliseconds));
+            timer.setText("" + mins + ":" + String.format("%02d", secs) + ":" + String.format("%03d", milliseconds));
             handler.postDelayed(this, 0);
         }
     };
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         timer = (TextView) findViewById(R.id.txt_timer_display);
         startStopButton = (Button) findViewById(R.id.btn_startstop);
+        resetButton = (Button) findViewById(R.id.btn_reset);
 
         startStopButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -59,14 +66,31 @@ public class MainActivity extends AppCompatActivity {
                 Button b = (Button) v;
                 if(b.getText().toString() == getResources().getString(R.string.start)){
                     b.setText(getResources().getString(R.string.stop));
-                    startTime = SystemClock.uptimeMillis();
-                    handler.postDelayed(updateTimerThread, 0);
+                    Random r = new Random();
+                    int l = 1000;
+                    int h = 5000;
+                    int soundDelay = r.nextInt(h-l) + l;
+                    handler.postDelayed(updateTimerThread, soundDelay);
                 }
                 else{
                     b.setText(getResources().getString(R.string.start));
                     timeSwapBuff += timeInMilliseconds;
                     handler.removeCallbacks(updateTimerThread);
                 }
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startTime = 0L;
+                started = false;
+                timeInMilliseconds = 0L;
+                timeSwapBuff = 0L;
+                updatedTime = 0L;
+                timer.setText(getResources().getString(R.string.timeVal));
+                startStopButton.setText(getResources().getString(R.string.start));
+                handler.removeCallbacks(updateTimerThread);
             }
         });
     }
