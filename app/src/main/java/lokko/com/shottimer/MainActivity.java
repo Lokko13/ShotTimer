@@ -22,31 +22,31 @@ public class MainActivity extends AppCompatActivity {
     private Button startStopButton;
     private Button resetButton;
 
-    private long startTime = 0L;
     private boolean started = false;
 
     long timeInMilliseconds = 0L;
-    long timeSwapBuff = 0L;
     long updatedTime = 0L;
+    long timeOnStart = 0L;
+    long timeOnStop = 0L;
 
-    Handler handler = new Handler();
+    Handler timerHandler = new Handler();
 
     private Runnable updateTimerThread = new Runnable() {
         @Override
         public void run() {
-            if(started == false){
-                startTime = SystemClock.uptimeMillis();
+            if(!started){
+                timeOnStart = SystemClock.uptimeMillis();
                 started = true;
             }
-            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-            updatedTime = timeSwapBuff + timeInMilliseconds;
+            timeInMilliseconds = SystemClock.uptimeMillis() - timeOnStart + timeOnStop;
+            updatedTime = timeInMilliseconds;
 
             int secs = (int) (updatedTime / 1000);
             int mins = secs / 60;
             secs = secs % 60;
             int milliseconds = (int) (updatedTime % 1000);
             timer.setText("" + mins + ":" + String.format("%02d", secs) + ":" + String.format("%03d", milliseconds));
-            handler.postDelayed(this, 0);
+            timerHandler.postDelayed(this, 0);
         }
     };
 
@@ -67,16 +67,22 @@ public class MainActivity extends AppCompatActivity {
                 Button b = (Button) v;
                 if(b.getText().toString() == getResources().getString(R.string.start)){
                     b.setText(getResources().getString(R.string.stop));
-                    Random r = new Random();
-                    int l = 1000;
-                    int h = 5000;
-                    int soundDelay = r.nextInt(h-l) + l;
-                    handler.postDelayed(updateTimerThread, soundDelay);
+                    if(!started){
+                        Random r = new Random();
+                        int l = 1000;
+                        int h = 3000;
+                        int soundDelay = r.nextInt(h-l) + l;
+                        timerHandler.postDelayed(updateTimerThread, soundDelay);
+                    }
+                    else {
+                        timeOnStart = SystemClock.uptimeMillis();
+                        timerHandler.postDelayed(updateTimerThread, 0);
+                    }
                 }
                 else{
+                    timeOnStop = updatedTime;
                     b.setText(getResources().getString(R.string.start));
-                    timeSwapBuff += timeInMilliseconds;
-                    handler.removeCallbacks(updateTimerThread);
+                    timerHandler.removeCallbacks(updateTimerThread);
                 }
             }
         });
@@ -84,14 +90,14 @@ public class MainActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startTime = 0L;
                 started = false;
+                timeOnStop = 0L;
+                timeOnStart = 0L;
                 timeInMilliseconds = 0L;
-                timeSwapBuff = 0L;
                 updatedTime = 0L;
                 timer.setText(getResources().getString(R.string.timeVal));
                 startStopButton.setText(getResources().getString(R.string.start));
-                handler.removeCallbacks(updateTimerThread);
+                timerHandler.removeCallbacks(updateTimerThread);
             }
         });
     }

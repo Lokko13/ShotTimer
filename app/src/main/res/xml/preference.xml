@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
-        android:title="Title"
-        android:key="pref_key_storage_settings">
 
-        <EditTextPreference
-            android:key="sample"
-            android:title="Loc"
-            android:summary="Summar"
-            android:defaultValue="1"/>
+    <Preference
+        android:key="threshold"
+        android:title="Calibrate Threshold"
+        android:defaultValue="50">
+    </Preference>
 
-    </PreferenceCategory>
 </PreferenceScreen>
