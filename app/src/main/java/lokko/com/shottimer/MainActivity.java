@@ -128,29 +128,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    public class StopTimer extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-
-//            lagay mo lang dito yung code for stopping the timer
-
-            /*
-
-            gawa ka ng instance ng StopTimer, tapos call mo yung execute(); Matic gagawin nya na yung AsyncTask
-            [blank lang since vinoid ko yung parameters (since napansin ko lahat nasa MainActivity naman]
-            parts kasi ng AsyncTask <Parameters, Progress, Result> pwede mo ivoid lahat
-
-            * Wag ka na gumamit ng handler since background thread naman to
-            * Wag mo din pala i-initialize yung AsyncTask statically (rekta .execute na agad. rerequire nya Runnable. Di nya makukuha yung nasa doInBackground (ex. StopTimer.execute(...))
-
-            Usage:
-            StopTimer s = new StopTimer();
-            s.execute();
-
-             */
-
-            return null;
-        }
-    }
 }
